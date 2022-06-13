@@ -17,7 +17,6 @@ const rateLimit = slowDown({
 });
 
 app.use(bodyParser.urlencoded({extended: true}));
-// app.use(fileUpload({safeFileNames: true, useTempFiles: true}));
 app.use(fileUpload({safeFileNames: true, createParentPath: true}));
 app.use(express.static(__dirname + '/tmp', {
   setHeaders: (res, _path, _stat) => {

@@ -24,12 +24,17 @@ app.use(express.static(__dirname + '/tmp', {
   },
 }));
 
+/**
+ * Convert a buffer to a stream
+ * @param      {Buffer}  binary  The binary
+ * @return     {stream.Readable}  the converted stream
+ */
 function bufferToStream(binary) {
   return new stream.Readable({
     read() {
       this.push(binary);
       this.push(null);
-    }
+    },
   });
 }
 
@@ -46,9 +51,9 @@ app.post('/', rateLimit, async (req, res) => {
     const reader = bufferToStream(req.files.file.data);
 
     const filename = (Math.random() + 1).toString(36).substring(7) + 'a.png';
-    const writer = fs.createWriteStream(path.join('./tmp', filename))
+    const writer = fs.createWriteStream(path.join('./tmp', filename));
 
-    reader.pipe(new ExifTransformer()).pipe(writer)
+    reader.pipe(new ExifTransformer()).pipe(writer);
     res.send(`${req.protocol}://${req.headers.host}/${filename}`);
   } catch (err) {
     console.error(err);
@@ -57,5 +62,6 @@ app.post('/', rateLimit, async (req, res) => {
 });
 
 app.listen(port, () => {
+  if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp');
   console.log('listening on port ' + port);
 });

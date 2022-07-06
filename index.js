@@ -18,7 +18,7 @@ const rateLimit = slowDown({
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(fileUpload({safeFileNames: true, createParentPath: true}));
-app.use(express.static(__dirname + '/tmp', {
+app.use(express.static('/tmp/3s', {
   setHeaders: (res, _path, _stat) => {
     res.contentType('image/png');
   },
@@ -42,7 +42,7 @@ app.get('/', (_req, res) => {
   res.end('3s');
 });
 
-app.post('/', rateLimit, async (req, res) => {
+app.post('/', rateLimit, (req, res) => {
   if (req.headers.authorization != 'Basic ' + secret) {
     return res.sendStatus(401);
   }
@@ -51,7 +51,7 @@ app.post('/', rateLimit, async (req, res) => {
     const reader = bufferToStream(req.files.file.data);
 
     const filename = (Math.random() + 1).toString(36).substring(7) + 'a.png';
-    const writer = fs.createWriteStream(path.join('./tmp', filename));
+    const writer = fs.createWriteStream(path.join('/tmp/3s', filename));
 
     reader.pipe(new ExifTransformer()).pipe(writer);
     res.send(`${req.protocol}://${req.headers.host}/${filename}`);
@@ -62,6 +62,6 @@ app.post('/', rateLimit, async (req, res) => {
 });
 
 app.listen(port, () => {
-  if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp');
+  if (!fs.existsSync('/tmp/3s')) fs.mkdirSync('/tmp/3s');
   console.log('listening on port ' + port);
 });
